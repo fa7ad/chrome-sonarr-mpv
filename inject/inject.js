@@ -1,53 +1,47 @@
+const $ = se => document.querySelector(se)
+const $$ = se => document.querySelectorAll(se)
+
 if (window.sonarr) {
-  window.checkfortriggers()
-  setInterval(window.checkfortriggers, 1900)
+  checkfortriggers()
+  setInterval(checkfortriggers, 1900)
 }
 
 if (!window.sonarr) {
-  const readyStateCheckInterval = setInterval(function () {
+  let readyStateCheckInterval = setInterval(function () {
     if (document.readyState === 'complete') {
       clearInterval(readyStateCheckInterval)
       window.sonarr = true
       console.log('Adding Triggers')
-      window.addtriggers()
-      setInterval(window.checkfortriggers, 1900)
+
+      addtriggers()
+      setInterval(checkfortriggers, 1900)
     }
   }, 10)
 }
 
-window.checkfortriggers = function () {
-  if (
-  document
-    .querySelectorAll('.fc-event.success')[0]
-    .getAttribute('data-sonarr') !== 'added'
-  ) {
+function checkfortriggers () {
+  if ($$('.fc-event.success').length < 1) return console.log('Not implemented.')
+  if (!$$('.fc-event.success')[0].getAttribute('data-sonarr')) {
     console.log('Re-adding triggers')
-    window.addtriggers()
+    addtriggers()
   }
 }
 
-window.turntolink = function () {
-  const linkDom = document.querySelector('div.episode-file-info tbody .renderable.string-cell')
-  if (linkDom) {
-    const ln = document.createElement('a')
-    ln.href = '#'
-    ln.setAttribute('onclick', `window.location.href="mpv://${linkDom.innerText}";`)
-    ln.innerHTML = linkDom.innerText
-    linkDom.innerHTML = ln.outerHTML
-    linkDom.addEventListener('click', function () {
-      setTimeout(function () {
-        window.history.go(-1)
-      }, 2000)
+function turntolink () {
+  const ln = $('div.episode-file-info tbody .renderable.string-cell')
+  if (ln) {
+    ln.style.color = 'rgb(0, 170, 250)'
+    ln.style.cursor = 'pointer'
+    ln.addEventListener('click', function (e) {
+      e.preventDefault()
+      window.location.replace(`mpv://${ln.innerText.trim()}`)
     })
   }
 }
 
-window.addtriggers = function () {
-  document.querySelectorAll('.fc-event.success').forEach(function (El) {
-    El.addEventListener('click', function () {
-      setTimeout(window.turntolink, 1000)
-      window.turntolink()
-    }, false)
+function addtriggers () {
+  $$('.fc-event.success').forEach(function (El) {
+    El.addEventListener('click', () => setTimeout(turntolink, 1000), false)
     El.setAttribute('data-sonarr', 'added')
   })
 }
