@@ -20,8 +20,12 @@ if (!window.sonarr) {
 }
 
 function checkfortriggers () {
-  if ($$('.fc-event.success').length < 1) return console.log('Not implemented.')
-  if (!$$('.fc-event.success')[0].getAttribute('data-sonarr')) {
+  if ($$('.fc-event.success').length > 1 && !Array.from($$('.fc-event.success')).slice(-1)[0].getAttribute('data-sonarr')) {
+    console.log('Re-adding triggers')
+    addtriggers()
+  }
+
+  if ($$('.episode-title-cell.renderable').length > 1 && !Array.from($$('.episode-title-cell.renderable')).slice(-1)[0].getAttribute('data-sonarr')) {
     console.log('Re-adding triggers')
     addtriggers()
   }
@@ -40,8 +44,11 @@ function turntolink () {
 }
 
 function addtriggers () {
-  $$('.fc-event.success').forEach(function (El) {
+  function addClickEvt (El) {
     El.addEventListener('click', () => setTimeout(turntolink, 1000), false)
     El.setAttribute('data-sonarr', 'added')
-  })
+  }
+
+  $$('.fc-event.success').forEach(addClickEvt)
+  $$('.episode-title-cell.renderable').forEach(addClickEvt)
 }
