@@ -1,6 +1,6 @@
 {
   "name": "Sonarr MPV",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "manifest_version": 2,
   "description": "Transform Sonarr File info to MPV URIs",
   "homepage_url": "http://github.com/fa7ad",
