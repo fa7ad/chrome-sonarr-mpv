@@ -1,15 +1,19 @@
-const $ = se => document.querySelector(se)
-const $$ = se => document.querySelectorAll(se)
+const $ = sel => {
+  const el = document.querySelectorAll(sel)
+  return el.length === 1 ? el[0] : el
+}
+
+let {Sonarr} = window
 
 let lookForTargets
 
-if (!window.sonarr) {
+if (!Sonarr) {
   let checkPageState = setInterval(function () {
     if (document.readyState === 'complete') {
       clearInterval(checkPageState)
-      window.sonarr = true
+      Sonarr = true
 
-      console.log('[sonarr-mpv]', 'Modifying page...')
+      console.info('[sonarr-mpv]', 'Modifying page...')
     }
   }, 10)
 }
@@ -18,15 +22,13 @@ if (lookForTargets) clearInterval(lookForTargets)
 lookForTargets = setInterval(addLaunchTriggers, 1000)
 
 function addLaunchTriggers () {
-  const targets = $$('.fc-event.success, .episode-title-cell.renderable')
+  const targets = $('.fc-event.success, .episode-title-cell.renderable')
 
   if (targets.length > 1) {
-    Array.from(targets)
-      .filter(t => !t.getAttribute('data-sonarr'))
-      .forEach(t => {
-        t.addEventListener('click', () => setTimeout(addMpvLink, 1000))
-        t.setAttribute('data-sonarr', 'added')
-      })
+    ;[].filter.call(targets, t => !t.getAttribute('data-sonarr')).forEach(t => {
+      t.addEventListener('click', () => setTimeout(addMpvLink, 1000))
+      t.setAttribute('data-sonarr', 'added')
+    })
   } else {
     // Popup might already be on screen
     addMpvLink()
